@@ -1,7 +1,16 @@
+from pathlib import Path
+
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
 
-def load_and_preprocess_data(file_path):
+try:
+    from .config import DATA_PATH
+except ImportError:
+    from config import DATA_PATH
+
+
+def load_and_preprocess_data(file_path: Path | str = DATA_PATH):
+    """Load and encode the survey data used by the legacy model."""
     # Load data
     data = pd.read_csv(file_path)
     
@@ -30,14 +39,9 @@ def load_and_preprocess_data(file_path):
     return processed_data, target_col
 
 if __name__ == "__main__":
-    import os
-    # Get current file path to find data directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, '..', 'data', 'Depression Student Dataset.csv')
-    
-    if os.path.exists(data_path):
-        df, target = load_and_preprocess_data(data_path)
+    if DATA_PATH.exists():
+        df, target = load_and_preprocess_data(DATA_PATH)
         print("Data preprocessed successfully.")
         print(df.head())
     else:
-        print(f"Data file not found at: {data_path}")
+        print(f"Data file not found at: {DATA_PATH}")

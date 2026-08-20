@@ -1,29 +1,32 @@
-import os
+from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import statsmodels.api as sm
-from preprocessing import load_and_preprocess_data
+try:
+    from .config import DATA_PATH, FEATURES, RANDOM_SEED, RESULTS_DIR, TEST_SIZE
+    from .preprocessing import load_and_preprocess_data
+except ImportError:
+    from config import DATA_PATH, FEATURES, RANDOM_SEED, RESULTS_DIR, TEST_SIZE
+    from preprocessing import load_and_preprocess_data
 
-def train_model():
-    # Paths
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, '..', 'data', 'Depression Student Dataset.csv')
-    results_path = os.path.join(current_dir, '..', 'results')
+def train_model(data_path: Path = DATA_PATH, results_path: Path = RESULTS_DIR):
+    """Fit the legacy four-feature logistic model and save its text report."""
+    results_path.mkdir(parents=True, exist_ok=True)
     
     # Load and preprocess
     df, target = load_and_preprocess_data(data_path)
     
     # Selected features based on statistical significance analysis in notebook
     # 'Dietary Habits', 'Have you ever had suicidal thoughts ?', 'Academic Pressure', 'Financial Stress'
-    features = ['Dietary Habits', 'Have you ever had suicidal thoughts ?', 'Academic Pressure', 'Financial Stress']
+    features = FEATURES
     
     X = df[features]
     y = df[target]
     
     # Split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=RANDOM_SEED)
     
     # Train Logistic Regression (Sklearn)
     model = LogisticRegression()
@@ -54,7 +57,7 @@ def train_model():
     print(result.summary())
     
     # Save results summary to results folder
-    with open(os.path.join(results_path, 'model_summary.txt'), 'w') as f:
+    with open(results_path / 'model_summary.txt', 'w', encoding='utf-8') as f:
         f.write(f"Accuracy: {accuracy:.4f}\n\n")
         f.write("Confusion Matrix:\n")
         f.write(str(cm) + "\n\n")

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -6,16 +6,17 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import learning_curve
-from preprocessing import load_and_preprocess_data
+try:
+    from .config import DATA_PATH, FEATURES, RESULTS_DIR
+    from .preprocessing import load_and_preprocess_data
+except ImportError:
+    from config import DATA_PATH, FEATURES, RESULTS_DIR
+    from preprocessing import load_and_preprocess_data
 
-def generate_and_save_plots():
-    # Paths
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, '..', 'data', 'Depression Student Dataset.csv')
-    images_path = os.path.join(current_dir, '..', 'images')
-    
-    if not os.path.exists(images_path):
-        os.makedirs(images_path)
+def generate_and_save_plots(data_path: Path = DATA_PATH, images_path: Path | None = None):
+    """Generate project figures from the configured survey dataset."""
+    images_path = images_path or (RESULTS_DIR / "figures")
+    images_path.mkdir(parents=True, exist_ok=True)
         
     # Load and preprocess
     df, target = load_and_preprocess_data(data_path)
@@ -31,7 +32,7 @@ def generate_and_save_plots():
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', square=True, cbar_kws={'shrink': .8})
     plt.title('Spearman Correlation Heatmap')
     plt.tight_layout()
-    plt.savefig(os.path.join(images_path, 'spearman_heatmap.png'))
+    plt.savefig(images_path / 'spearman_heatmap.png')
     plt.close()
     
     # 2. Correlation with Depression
@@ -42,7 +43,7 @@ def generate_and_save_plots():
     plt.xlabel('Correlation Coefficient')
     plt.axvline(0, color='grey', linestyle='--')
     plt.tight_layout()
-    plt.savefig(os.path.join(images_path, 'correlation_with_depression.png'))
+    plt.savefig(images_path / 'correlation_with_depression.png')
     plt.close()
     
     # 3. Countplot: Dietary Habits
@@ -52,7 +53,7 @@ def generate_and_save_plots():
     sns.countplot(data=raw_data, x='Dietary Habits', hue='Depression', palette='Set2')
     plt.title('Depression by Dietary Habits')
     plt.tight_layout()
-    plt.savefig(os.path.join(images_path, 'countplot_dietary_habits.png'))
+    plt.savefig(images_path / 'countplot_dietary_habits.png')
     plt.close()
     
     # 4. Countplot: Suicidal Thoughts
@@ -60,11 +61,11 @@ def generate_and_save_plots():
     sns.countplot(data=raw_data, x='Have you ever had suicidal thoughts ?', hue='Depression', palette='Set1')
     plt.title('Depression by Suicidal Thoughts')
     plt.tight_layout()
-    plt.savefig(os.path.join(images_path, 'countplot_suicidal_thoughts.png'))
+    plt.savefig(images_path / 'countplot_suicidal_thoughts.png')
     plt.close()
     
     # 5. Learning Curve
-    features = ['Dietary Habits', 'Have you ever had suicidal thoughts ?', 'Academic Pressure', 'Financial Stress']
+    features = FEATURES
     X = df[features]
     y = df[target]
     
@@ -83,7 +84,7 @@ def generate_and_save_plots():
     plt.title('Learning Curve')
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(os.path.join(images_path, 'learning_curve.png'))
+    plt.savefig(images_path / 'learning_curve.png')
     plt.close()
     
     print("All plots generated and saved successfully in 'images/' folder.")

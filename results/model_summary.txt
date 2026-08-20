@@ -1,0 +1,36 @@
+Accuracy: 0.9010
+
+Confusion Matrix:
+[[42  6]
+ [ 4 49]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.91      0.88      0.89        48
+           1       0.89      0.92      0.91        53
+
+    accuracy                           0.90       101
+   macro avg       0.90      0.90      0.90       101
+weighted avg       0.90      0.90      0.90       101
+
+
+Statsmodels Summary:
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:             Depression   No. Observations:                  401
+Model:                          Logit   Df Residuals:                      396
+Method:                           MLE   Df Model:                            4
+Date:                Thu, 20 Aug 2026   Pseudo R-squ.:                  0.4922
+Time:                        22:57:06   Log-Likelihood:                -141.14
+converged:                       True   LL-Null:                       -277.94
+Covariance Type:            nonrobust   LLR p-value:                 5.316e-58
+=========================================================================================================
+                                            coef    std err          z      P>|z|      [0.025      0.975]
+---------------------------------------------------------------------------------------------------------
+const                                    -6.4087      0.655     -9.790      0.000      -7.692      -5.126
+Dietary Habits                            0.7303      0.188      3.889      0.000       0.362       1.098
+Have you ever had suicidal thoughts ?     3.1597      0.364      8.670      0.000       2.445       3.874
+Academic Pressure                         1.2947      0.146      8.858      0.000       1.008       1.581
+Financial Stress                          0.7378      0.120      6.173      0.000       0.504       0.972
+=========================================================================================================
